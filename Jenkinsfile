@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_CREDENTIALS_ID = "dockerhub-creds" // Jenkins credentials ID for Docker Hub
+        DOCKER_CREDENTIALS_ID = "dockerhub-creds"
         FRONTEND_IMAGE = "raveeshapeiris/ecommerce-frontend"
         BACKEND_IMAGE = "raveeshapeiris/ecommerce-backend"
     }
@@ -10,21 +10,34 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                git branch: 'main', 
-                    credentialsId: 'github-creds', // Add this credential in Jenkins using your GitHub PAT
-                    url: 'https://github.com/RaveeshaPeiris/Ecommerce.git'
+                withCredentials([usernamePassword(
+                    credentialsId: 'github-creds',
+                    usernameVariable: 'GIT_USER',
+                    passwordVariable: 'GIT_PAT'
+                )]) {
+                    sh '''
+                        git config --global credential.helper store
+                        git clone https://$GIT_USER:$GIT_PAT@github.com/RaveeshaPeiris/Ecommerce.git
+                        cd Ecommerce
+                        ls -la
+                    '''
+                }
             }
         }
 
         stage('Build Frontend Image') {
             steps {
-                sh 'docker build -t $FRONTEND_IMAGE:$BUILD_NUMBER ./frontend'
+                dir('Ecommerce/frontend') {
+                    sh 'docker build -t $FRONTEND_IMAGE:$BUILD_NUMBER .'
+                }
             }
         }
 
         stage('Build Backend Image') {
             steps {
-                sh 'docker build -t $BACKEND_IMAGE:$BUILD_NUMBER ./backend'
+                dir('Ecommerce/backend') {
+                    sh 'docker build -t $BACKEND_IMAGE:$BUILD_NUMBER .'
+                }
             }
         }
 
