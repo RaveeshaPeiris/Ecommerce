@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_CREDENTIALS_ID = "dockerhub-creds"
+        DOCKER_CREDENTIALS_ID = "dockerhub-creds" // Set this up in Jenkins > Manage Jenkins > Credentials
         FRONTEND_IMAGE = "raveeshapeiris/ecommerce-frontend"
         BACKEND_IMAGE = "raveeshapeiris/ecommerce-backend"
     }
@@ -28,7 +28,11 @@ pipeline {
 
         stage('Login to Docker Hub') {
             steps {
-                withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS_ID}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                withCredentials([usernamePassword(
+                    credentialsId: "${DOCKER_CREDENTIALS_ID}",
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
                     sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
                 }
             }
