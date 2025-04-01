@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_CREDENTIALS_ID = "dockerhub-creds" // Set this up in Jenkins > Manage Jenkins > Credentials
+        DOCKER_CREDENTIALS_ID = "dockerhub-creds" // Jenkins credentials ID for Docker Hub
         FRONTEND_IMAGE = "raveeshapeiris/ecommerce-frontend"
         BACKEND_IMAGE = "raveeshapeiris/ecommerce-backend"
     }
@@ -10,7 +10,9 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                git branch: 'main', url: 'https://github.com/RaveeshaPeiris/Ecommerce.git'
+                git branch: 'main', 
+                    credentialsId: 'github-creds', // Add this credential in Jenkins using your GitHub PAT
+                    url: 'https://github.com/RaveeshaPeiris/Ecommerce.git'
             }
         }
 
@@ -27,17 +29,16 @@ pipeline {
         }
 
         stage('Login to Docker Hub') {
-    steps {
-        withCredentials([usernamePassword(
-            credentialsId: 'test-dockerhub',
-            usernameVariable: 'DOCKER_USER',
-            passwordVariable: 'DOCKER_PASS'
-        )]) {
-            sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: "${DOCKER_CREDENTIALS_ID}",
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                }
+            }
         }
-    }
-}
-
 
         stage('Push Frontend & Backend') {
             steps {
