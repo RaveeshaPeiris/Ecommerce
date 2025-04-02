@@ -3,9 +3,9 @@ provider "aws" {
 }
 
 resource "aws_instance" "ecommerce" {
-  ami           = "ami-0c55b159cbfafe1f0"  # Ubuntu 20.04 (check your region's AMI)
-  instance_type = "t2.micro"
-  key_name      = "your-key-name" # Replace with your AWS EC2 key pair
+  ami           = "ami-0989fb15ce71ba39e"  # Ubuntu Server 20.04 LTS in eu-north-1
+  instance_type = "t3.micro"
+  key_name      = "ecommerce-key" # Replace with your AWS EC2 key pair
 
   vpc_security_group_ids = [aws_security_group.ecommerce_sg.id]
 

@@ -1,0 +1,11 @@
+# Terraform directories and files to ignore
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.lock.hcl
+
+# Ignore Terraform provider binaries
+terraform/.terraform/
+
+# Optional: ignore local inventory file
+inventory.ini
