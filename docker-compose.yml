@@ -11,7 +11,7 @@ services:
       - ./frontend:/usr/src/app
       - /usr/src/app/node_modules
     environment:
-      - VITE_BACKEND_URL=http://localhost:5000
+      - VITE_BACKEND_URL=http://13.60.171.11:5000
     depends_on:
       - backend
 
