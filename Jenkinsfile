@@ -5,7 +5,7 @@ pipeline {
         DOCKER_CREDENTIALS_ID = "dockerhub-creds"  // Jenkins credentials ID for Docker Hub
         FRONTEND_IMAGE = "raveeshapeiris/ecommerce-frontend"
         BACKEND_IMAGE = "raveeshapeiris/ecommerce-backend"
-        AWS_CREDENTIALS_ID = "aws-creds"  // Add this to Jenkins for AWS credentials
+        AWS_CREDENTIALS_ID = "aws-creds"  // AWS credentials ID in Jenkins
         TF_DIR = "infrastructure"  // Directory where your Terraform code is located
         ANSIBLE_DIR = "ansible"  // Directory where your Ansible playbooks are located
     }
@@ -58,6 +58,7 @@ pipeline {
         // Terraform - Initialize and Apply for Infrastructure provisioning
         stage('Terraform - Initialize and Apply') {
             steps {
+                // Using AWS credentials for Terraform configuration
                 withCredentials([awsCredentials(credentialsId: "${AWS_CREDENTIALS_ID}")]) {
                     dir("${TF_DIR}") {
                         sh 'terraform init'  // Initialize Terraform configuration
@@ -70,11 +71,12 @@ pipeline {
         // Ansible - Configure EC2 infrastructure
         stage('Ansible - Configure Infrastructure') {
             steps {
-                withCredentials([awsCredentials(credentialsId: "${AWS_CREDENTIALS_ID}")]) {
-                    dir("${ANSIBLE_DIR}") {
-                        // Ensure your inventory.ini and playbook.yml are correctly set up
-                        sh 'ansible-playbook -i inventory.ini playbook.yml'  // Run Ansible playbook
-                    }
+                // Using AWS credentials for Ansible playbook execution
+               withCredentials([awsCredentials(credentialsId: "aws-creds")]) {  // Use correct credentials ID
+    dir("ansible") {  // Ensure this points to the directory where your playbook.yml and inventory.ini are located
+        sh 'ansible-playbook -i inventory.ini playbook.yml'  // Run Ansible playbook
+    }
+}
                 }
             }
         }
