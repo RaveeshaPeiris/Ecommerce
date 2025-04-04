@@ -1,0 +1,55 @@
+---
+- name: Configure EC2 instance
+  hosts: webservers
+  become: yes  # This means Ansible will run commands as root (via sudo)
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+
+    - name: Install Node.js
+      apt:
+        name: nodejs
+        state: present
+
+    - name: Install npm
+      apt:
+        name: npm
+        state: present
+
+    - name: Clone the frontend repository
+      git:
+        repo: 'https://github.com/RaveeshaPeiris/Ecommerce.git'
+        dest: /home/ubuntu/ecommerce-frontend
+        version: main
+
+    - name: Clone the backend repository
+      git:
+        repo: 'https://github.com/RaveeshaPeiris/Ecommerce.git'
+        dest: /home/ubuntu/ecommerce-backend
+        version: main
+
+    - name: Install frontend dependencies
+      command: npm install
+      args:
+        chdir: /home/ubuntu/ecommerce-frontend
+
+    - name: Install backend dependencies
+      command: npm install
+      args:
+        chdir: /home/ubuntu/ecommerce-backend
+
+    - name: Start frontend server
+      command: npm start
+      args:
+        chdir: /home/ubuntu/ecommerce-frontend
+
+    - name: Start backend server
+      command: npm start
+      args:
+        chdir: /home/ubuntu/ecommerce-backend
